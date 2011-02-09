@@ -623,7 +623,7 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
 	var case_select_server = {
 			type:_CASE_, numCols:2, colSizes:["100px","*"],
             tabGroupKey:ZaCertWizard.STEP_SELECT_SERVER, caseKey:ZaCertWizard.STEP_SELECT_SERVER,
-			align:_LEFT_, valign:_TOP_, cssStyle:"padding-left:50px;"
+			align:_LEFT_, valign:_TOP_, cssStyle:"padding-left:50px;", width: "80%"
 		};
 	
 	var case_select_server_items = [
