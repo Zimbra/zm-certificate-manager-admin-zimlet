@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Zimbra Collaboration Suite Server
- * Copyright (C) 2007, 2008, 2009, 2010 Zimbra, Inc.
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 VMware, Inc.
  * 
  * The contents of this file are subject to the Zimbra Public License
  * Version 1.3 ("License"); you may not use this file except in
@@ -751,7 +751,7 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
 				style: DwtAlert.WARNING, iconVisible: false,
 				content: com_zimbra_cert_manager.CSR_EXISTS_WARNING 
 		 }, 
-		{type: _GROUP_ , colSpan:2, numCols: 2, colSizes:["150px","*"], width:"100%",
+		{type: _GROUP_ , colSpan:2, numCols: 2, colSizes:["150px","300px"],
 			  items :[
 				{	type: _GROUP_, numCols:2, colSpan: "*", colSizes:["150px","*"], items: [
 						{ type:_SPACER_, height: 10},
@@ -844,8 +844,8 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
 					repeatInstance:"", 
 					showAddButton:true, 
 					showRemoveButton:true,
-                    removeButtonCSSStyle:"margin-left:10px;",
-                    addButtonCSSStyle:"margin-left:10px;",
+                    addButtonWidth: 50,
+                    removeButtonWidth: 50,
                     //showAddOnNextRow:true,
 					alwaysShowAddButton:true,
 					removeButtonLabel:com_zimbra_cert_manager.NAD_Remove,								
@@ -1041,17 +1041,16 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
 	
 		cases.push (case_csr_confirm) ;
 
-    var w = "480px" ;
+    var contentW = 450 ;
     if (AjxEnv.isIE) {
-        w = "530px" ;
+        contentW = 500 ;
     }
-
     xFormObject.items = [
 			{type:_OUTPUT_, colSpan:2, align:_CENTER_, valign:_TOP_, ref:ZaModel.currentStep,
                 choices:this.stepChoices, valueChangeEventSources:[ZaModel.currentStep]},
 			{type:_SEPARATOR_, align:_CENTER_, valign:_TOP_},
 			{type:_SPACER_,  align:_CENTER_, valign:_TOP_},
-			{type:_SWITCH_,  width:w, align:_LEFT_, valign:_TOP_, items:cases}
+			{type:_SWITCH_, width:contentW, align:_LEFT_, valign:_TOP_, items:cases}
 		];
 };
 ZaXDialog.XFormModifiers["ZaCertWizard"].push(ZaCertWizard.myXFormModifier);

@@ -1,5 +1,5 @@
 if (window.console && window.console.log) window.console.log("Loaded ZaCert.js");
-if(ZaSettings && ZaSettings.EnabledZimlet["com_zimbra_cert_manager"]){
+
 function ZaCert () {
 	ZaItem.call(this,  "ZaCert");
 	this._init();
@@ -152,51 +152,6 @@ ZaCert.certOvTreeModifier = function (tree) {
 	
 	if(ZaSettings.ENABLED_UI_COMPONENTS[ZaSettings.CERTS_VIEW] || ZaSettings.ENABLED_UI_COMPONENTS[ZaSettings.CARTE_BLANCHE_UI]) {
 		try {
-            if (appNewUI) {
-            var parentPath = ZaTree.getPathByArray([ZaMsg.OVP_home, ZaMsg.OVP_configure]);
-
-			var serverList = overviewPanelController._app.getServerList().getArray();
-			if(serverList && serverList.length) {
-				var cnt = serverList.length;
-				if(cnt>0) {
-                    var certTi = new ZaTreeItemData({
-                                        parent:parentPath,
-                                        id:ZaId.getTreeItemId(ZaId.PANEL_APP,ZaId.PANEL_CONFIGURATION,null, "CertHV"),
-                                        text: com_zimbra_cert_manager.OVP_certs,
-                                        canShowOnRoot: false,
-                                        forceNode: false,
-                                        mappingId: ZaZimbraAdmin._CERTS_SERVER_LIST_VIEW});
-                    tree.addTreeItemData(certTi);
-					//add the server nodes
-                    var subParentPath = ZaTree.getPathByArray([ZaMsg.OVP_home, ZaMsg.OVP_configure, com_zimbra_cert_manager.OVP_certs]);
-					for(var ix=0; ix< cnt; ix++) {
-                        var ti1 = new ZaTreeItemData({
-                                parent:subParentPath,
-                                id:DwtId._makeId(certTi.id, ix + 1),
-                                text: serverList[ix].name,
-                                mappingId: ZaZimbraAdmin._CERTS});
-                        ti1.setData(ZaOverviewPanelController._OBJ_ID, serverList[ix].id);
-                        tree.addTreeItemData(ti1);
-						ZaCert.TARGET_SERVER_CHOICES.push (
-							{label: serverList[ix].name, value: serverList[ix].id }
-						);
-					}
-					ZaOverviewPanelController.overviewTreeListeners[ZaZimbraAdmin._CERTS_SERVER_LIST_VIEW] = ZaCert.certsServerListTreeListener;
-				} else {
-                    var certTi = new ZaTreeItemData({
-                                        parent:parentPath,
-                                        id:ZaId.getTreeItemId(ZaId.PANEL_APP,ZaId.PANEL_CONFIGURATION,null, "CertHV"),
-                                        text: com_zimbra_cert_manager.OVP_certs,
-                                        mappingId: ZaZimbraAdmin._CERTS});
-					certTi.setData(ZaOverviewPanelController._OBJ_ID, serverList[0].id);
-                    tree.addTreeItemData(certTi);
-					ZaCert.TARGET_SERVER_CHOICES.push (
-							{label: serverList[0].name, value: serverList[0].id }
-						);
-				}
-				ZaOverviewPanelController.overviewTreeListeners[ZaZimbraAdmin._CERTS] = ZaCert.certsServerNodeTreeListener;
-			}
-            } else {
 			overviewPanelController._certTi = new DwtTreeItem({parent:overviewPanelController._toolsTi,className:"AdminTreeItem"});
 			overviewPanelController._certTi.setText(com_zimbra_cert_manager.OVP_certs);
 			overviewPanelController._certTi.setImage("OverviewCertificate"); //TODO: Use Cert icons
@@ -208,8 +163,8 @@ ZaCert.certOvTreeModifier = function (tree) {
 					overviewPanelController._certTi.setData(ZaOverviewPanelController._TID, ZaZimbraAdmin._CERTS_SERVER_LIST_VIEW);
 					//add the server nodes
 					for(var ix=0; ix< cnt; ix++) {
-						var ti1 = new DwtTreeItem({parent:overviewPanelController._certTi,className:"AdminTreeItem"});
-						ti1.setText(serverList[ix].name);
+						var ti1 = new DwtTreeItem({parent:overviewPanelController._certTi,className:"AdminTreeItem"});			
+						ti1.setText(serverList[ix].name);	
 						ti1.setImage("Server");
 						ti1.setData(ZaOverviewPanelController._TID, ZaZimbraAdmin._CERTS);
 						ti1.setData(ZaOverviewPanelController._OBJ_ID, serverList[ix].id);
@@ -227,7 +182,6 @@ ZaCert.certOvTreeModifier = function (tree) {
 				}
 				ZaOverviewPanelController.overviewTreeListeners[ZaZimbraAdmin._CERTS] = ZaCert.certsServerNodeTreeListener;
 			}
-            }
 		} catch (ex) {
 			overviewPanelController._handleException(ex, "ZaCert.certOvTreeModifier", null, false);
 		}
@@ -260,72 +214,6 @@ ZaCert.certsServerNodeTreeListener = function (ev) {
 			ZaCert.getCerts(ZaApp.getInstance(), serverNodeId),
 			serverNodeId);
 	}
-}
-
-if (ZaHome && ZaHome.myXModel) {
-    ZaHome.A2_expiredType = "expiredType";
-    ZaHome.A2_expiredMessage = "expiredMessage";
-    ZaHome.myXModel.items.push(
-       {id:ZaHome.A2_expiredMessage, type:_STRING_, ref: "attrs/" + ZaHome.A2_expiredMessage}
-    );
-    ZaHome.myXModel.items.push(
-       {id:ZaHome.A2_expiredType, type:_ENUM_, ref: "attrs/" + ZaHome.A2_expiredType, choices: ZaModel.BOOLEAN_CHOICES}
-    );
-    ZaHome.loadCert = function () {
-        this.attrs[ZaHome.A2_expiredType] = true;
-        this.attrs[ZaHome.A2_expiredMessage] = ZaMsg.LBL_HomeStatusOK;
-    }
-    ZaItem.loadMethods["ZaHome"].push(ZaHome.loadCert);
-}
-
-if(ZaTabView.XFormModifiers["ZaHomeXFormView"]) {
-
-
-    ZaHomeXFormView.onInstallCertficate = function (ev) {
-        var certServerList = ZaApp.getInstance().getCertsServerListController();
-        var serverList = ZaServer.getAll();
-        if (serverList.size() > 0) {
-            var lastServer = serverList.getVector().getLast();
-            var certServerList = ZaApp.getInstance().getCertsServerListController();
-            ZaCert.launchNewCertWizard.call (certServerList, lastServer.id) ;
-        }
-    }
-
-    ZaCert.HomeXFormModifier = function(xFormObject) {
-        if(ZaSettings.ENABLED_UI_COMPONENTS[ZaSettings.CERTS_VIEW] || ZaSettings.ENABLED_UI_COMPONENTS[ZaSettings.CARTE_BLANCHE_UI]) {
-            var maintainItem;
-            maintainItem = ZaHomeXFormView.getHomeMaintenanceItem(xFormObject);
-            maintainItem.items[4].items = [
-                    {type:_OUTPUT_, value: ZaMsg.LBL_HomeExpiredCerts},
-                    {type:_OUTPUT_, ref: ZaHome.A2_expiredType,
-                        getDisplayValue: function (value){
-                            if (value) {
-                                return AjxImg.getImageHtml ("Check");
-                            } else {
-                                return AjxImg.getImageHtml ("Cancel");
-                            }
-                        }
-                    },
-                    {type:_OUTPUT_, ref: ZaHome.A2_expiredMessage}
-            ];
-
-            var setupItem = ZaHomeXFormView.getHomeSetupItem(xFormObject);
-            var labelItem = setupItem.headerLabels;
-            var contentItem = setupItem.contentItems;
-            var index;
-            for (var index = 0; index < labelItem.length; index ++ ) {
-                if (labelItem[index] == ZaMsg.LBL_HomeGetStared) {
-                    break;
-                }
-            }
-            if (index != labelItem.length) {
-                var content = contentItem[index];
-                content[2] = {value:ZaMsg.LBL_HomeInstallCert, onClick: ZaHomeXFormView.onInstallCertficate};
-            }
-        }
-    }
-
-    ZaTabView.XFormModifiers["ZaHomeXFormView"].push(ZaCert.HomeXFormModifier);
 }
 
 ZaCert.getCerts = function (app, serverId) {
@@ -569,5 +457,4 @@ ZaCert.getWildCardServerName = function (serverName)  {
 	}
 	
 	return serverName ;
-}
 }
