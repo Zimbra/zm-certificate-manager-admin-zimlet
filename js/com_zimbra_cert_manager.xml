@@ -8,7 +8,9 @@
 	<include>ZaCertWizard.js</include>
 	<include>ZaCertsServerListView.js</include>
 	<include>ZaCertViewController.js</include>
-	<include>ZaCertsServerListController.js</include>
+        <include>ZaCertsServerListController.js</include>
+	<include>ZaDomainCertUpload.js</include>
+    <include>ZaProxyCAUpload.js</include>
 	<include>zimbra_cert.js</include>
 	<disableUIUndeploy>TRUE</disableUIUndeploy>
 </zimlet>
