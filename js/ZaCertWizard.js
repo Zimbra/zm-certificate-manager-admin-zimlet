@@ -827,7 +827,7 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
                     label: com_zimbra_cert_manager.CERT_digest,
                     labelLocation: _LEFT_,
                     choices: ZaCert.DIGEST_CHOICES,
-                    visibilityChecks: [],
+                    visibilityChecks: [ZaCertWizard.isCSRFieldsEnabled],
                     enableDisableChecks: [ZaCertWizard.isCSRFieldsEnabled],
                     enableDisableChangeEventSources: [
                         ZaCert.A_csr_exists,
@@ -840,7 +840,7 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
                     label: com_zimbra_cert_manager.CERT_keysize,
                     labelLocation: _LEFT_,
                     choices: ZaCert.KEY_SIZE_CHOICES,
-                    visibilityChecks: [],
+                    visibilityChecks: [ZaCertWizard.isCSRFieldsEnabled],
                     enableDisableChecks: [ZaCertWizard.isCSRFieldsEnabled],
                     enableDisableChangeEventSources: [
                         ZaCert.A_csr_exists,
