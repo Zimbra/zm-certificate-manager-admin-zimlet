@@ -123,7 +123,7 @@ ZaCert.prototype.init = function (getCSRResp) {
 	this [ZaCert.A_type_self]  = true ;
 	this [ZaCert.A_type_comm] = false ;
 	this [ZaCert.A_type_csr] = false ;
-    this [ZaCert.A_digest] = "sha1";
+	this [ZaCert.A_digest] = "sha256";
     this [ZaCert.A_keysize] = "2048" ;
 	this.initCSR(getCSRResp) ;
 	this [ZaCert.A_validation_days] = ZaCert.DEFAULT_VALIDATION_DAYS ;

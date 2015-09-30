@@ -559,7 +559,7 @@ function(entry) {
 	
 	this._containedObject[ZaModel.currentStep] = entry[ZaModel.currentStep]||ZaCertWizard.STEP_SELECT_SERVER;
     if (this._containedObject [ZaCert.A_digest] == null) {
-        this._containedObject [ZaCert.A_digest] = "sha1";
+		this._containedObject [ZaCert.A_digest] = "sha256";
     }
     if (this._containedObject [ZaCert.A_keysize] == null) {
         this._containedObject [ZaCert.A_keysize] = "2048" ;    
