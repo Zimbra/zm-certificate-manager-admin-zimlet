@@ -84,40 +84,64 @@ ZaXDialog.XFormModifiers["ZaNewDomainXWizard"].push(ZaProxyCAUpload.myDlgXFormMo
 
 ZaProxyCAUpload.uploadCertFormIdForConfig = Dwt.getNextId();
 ZaProxyCAUpload.uploadiFrameIdForConfig = Dwt.getNextId();
+ZaProxyCAUpload.uploadAttachmentIdForConfig = Dwt.getNextId();
+
 ZaProxyCAUpload.uploadCertFormIdForServer = Dwt.getNextId();
 ZaProxyCAUpload.uploadiFrameIdForServer = Dwt.getNextId();
+ZaProxyCAUpload.uploadAttachmentIdForServer = Dwt.getNextId();
+
 ZaProxyCAUpload.uploadCertFormIdForDomain = Dwt.getNextId();
 ZaProxyCAUpload.uploadiFrameIdForDomain = Dwt.getNextId();
+ZaProxyCAUpload.uploadAttachmentIdForDomain = Dwt.getNextId();
+
 ZaProxyCAUpload.uploadCertFormIdForDlg = Dwt.getNextId();
 ZaProxyCAUpload.uploadiFrameIdForDlg = Dwt.getNextId();
+ZaProxyCAUpload.uploadAttachmentIdForDlg = Dwt.getNextId();
 
 ZaProxyCAUpload.uploadCertFormId = Dwt.getNextId();
 ZaProxyCAUpload.uploadiFrameId = Dwt.getNextId();
+ZaProxyCAUpload.uploadAttachmentId = Dwt.getNextId();
 
 ZaProxyCAUpload.getUploadCertFormId = function (caller) {
-    if(caller instanceof GlobalConfigXFormView)
+    if(caller instanceof GlobalConfigXFormView) {
         return  ZaProxyCAUpload.uploadCertFormIdForConfig;
-    else if(caller instanceof ZaServerXFormView)
+    } else if(caller instanceof ZaServerXFormView) {
         return ZaProxyCAUpload.uploadCertFormIdForServer;
-    else if(caller instanceof ZaDomainXFormView)
+    } else if(caller instanceof ZaDomainXFormView) {
         return ZaProxyCAUpload.uploadCertFormIdForDomain;
-    else if(caller instanceof ZaNewDomainXWizard)
+    } else if(caller instanceof ZaNewDomainXWizard) {
         return ZaProxyCAUpload.uploadCertFormIdForDlg;
-    else // others, give a valid dwt id
-        return ZaProxyCAUpload.uploadCertFormIdForConfig;
+    } else { // others, give a valid dwt id
+        return ZaProxyCAUpload.uploadCertFormId;
+    }
+}
+
+ZaProxyCAUpload.getUploadCertAttachmentId = function (caller) {
+    if(caller instanceof GlobalConfigXFormView) {
+        return  ZaProxyCAUpload.uploadAttachmentIdForConfig;
+    } else if(caller instanceof ZaServerXFormView) {
+        return ZaProxyCAUpload.uploadAttachmentIdForServer;
+    } else if(caller instanceof ZaDomainXFormView) {
+        return ZaProxyCAUpload.uploadAttachmentIdForDomain;
+    } else if(caller instanceof ZaNewDomainXWizard) {
+        return ZaProxyCAUpload.uploadAttachmentIdForDlg;
+    } else { // others, give a valid dwt id
+        return ZaProxyCAUpload.uploadAttachmentId;
+    }
 }
 
 ZaProxyCAUpload.getUploadiFrameId = function (caller) {
-    if(caller instanceof GlobalConfigXFormView)
+    if(caller instanceof GlobalConfigXFormView) {
         return  ZaProxyCAUpload.uploadiFrameIdForConfig;
-    else if(caller instanceof ZaServerXFormView)
+    } else if(caller instanceof ZaServerXFormView) {
         return ZaProxyCAUpload.uploadiFrameIdForServer;
-    else if(caller instanceof ZaDomainXFormView)
+    } else if(caller instanceof ZaDomainXFormView) {
         return ZaProxyCAUpload.uploadiFrameIdForDomain;
-    else if(caller instanceof ZaNewDomainXWizard)
+    } else if(caller instanceof ZaNewDomainXWizard) {
         return ZaProxyCAUpload.uploadiFrameIdForDlg;
-    else  // others, give a valid dwt id
-        return ZaProxyCAUpload.uploadiFrameIdForConfig;
+    } else {  // others, give a valid dwt id
+        return ZaProxyCAUpload.uploadiFrameId;
+    }
 }
 
 ZaProxyCAUpload.getUploadFormHtml = function(caller) {
@@ -131,7 +155,9 @@ ZaProxyCAUpload.getUploadFormHtml = function(caller) {
 	html[idx++] = "' enctype='multipart/form-data'>" ;
 	html[idx++] = "<div><table border=0 cellspacing=0 cellpadding=2 style='table-layout: fixed;'> " ;
 	html[idx++] = "<colgroup><col width='250' /><col width=50 /></colgroup>";
-	html[idx++] = "<tbody><td><input type='file'  name='certFile' width='200'></input></td><td></td></tr>";
+	html[idx++] = "<tbody><td><input type='file' id='";
+	html[idx++] = ZaProxyCAUpload.getUploadCertAttachmentId(caller);
+	html[idx++] = "' name='certFile' width='200'></input></td><td></td></tr>";
 	html[idx++] = "</tbody></table></div>";
 	html[idx++] = "</form></div>";
 
@@ -173,14 +199,20 @@ ZaProxyCAUpload.uploadCertKeyFile = function() {
         }
     }
 
+    var caller = this.getForm().parent;
     var certUploadCallback = new AjxCallback(this, ZaProxyCAUpload._uploadCallback);
-    var um = new AjxPost(ZaProxyCAUpload.getUploadFrameId(this.getForm().parent));
-    window._uploadManager = um;
     try {
-        um.execute(certUploadCallback, document.getElementById (certFormId));
-        return ;
-    }catch (err) {
-        ZaApp.getInstance().getCurrentController().popupErrorDialog(com_zimbra_cert_manager.certFileNameError) ;
+        if(AjxEnv.supportsHTML5File) {
+            var uploader = new ZaUploader();
+            uploader.upload(ZaProxyCAUpload.getUploadCertAttachmentId(caller), appContextPath + "/../service/upload?fmt=extended,raw",  certUploadCallback);
+        } else {
+            var um = new AjxPost(ZaProxyCAUpload.getUploadFrameId(caller));
+            window._uploadManager = um;
+            um.execute(certUploadCallback, document.getElementById (certFormId));
+            return;
+        }
+    } catch (err) {
+        ZaApp.getInstance().getCurrentController().popupErrorDialog((err && err.msg) ? err.msg : com_zimbra_cert_manager.certFileNameError) ;
         return ;
     }
 }
