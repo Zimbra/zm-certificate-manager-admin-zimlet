@@ -55,6 +55,7 @@ ZaTabView.XFormModifiers["ZaDomainXFormView"].push(ZaDomainCertUpload.myXFormMod
 
 ZaDomainCertUpload.uploadCertFormId = Dwt.getNextId();
 ZaDomainCertUpload.uploadiFrameId = Dwt.getNextId();
+ZaDomainCertUpload.attachmentInputId = Dwt.getNextId();
 
 ZaDomainCertUpload.getUploadFormHtml = function() {
 	var uri = appContextPath + "/../service/upload?fmt=extended";
@@ -71,7 +72,9 @@ ZaDomainCertUpload.getUploadFormHtml = function() {
 	html[idx++] = "<colgroup><col width=" + width + "/><col width='*' /><col width=20 /></colgroup>";
 
 	html[idx++] = "<tbody><tr><td>" + ZaMsg.NAD_DomainSSLCertificate + ":</td>";
-	html[idx++] = "<td><input type=file  name='certFile' size='40' /></td><td>&nbsp</td></tr>";
+	html[idx++] = "<td><input type=file id='";
+	html[idx++] = ZaDomainCertUpload.attachmentInputId;
+	html[idx++] = "' name='certFile' size='40' /></td><td>&nbsp</td></tr>";
 
 	html[idx++] = "<tr><td>" + ZaMsg.NAD_DomainSSLPrivateKey + ":</td>";
 	html[idx++] = "<td><input type=file  name='keyFile' size='40' /></td><td>&nbsp</td></tr>";
@@ -88,7 +91,7 @@ ZaDomainCertUpload.uploadCertKeyFile = function() {
     var inputEls = formEl.getElementsByTagName("input") ;
 
     ZaDomainCertUpload.uploadInputs = {
-        certFile : null ,
+        certFile : null,
         keyFile : null
     };
 
@@ -102,7 +105,7 @@ ZaDomainCertUpload.uploadCertKeyFile = function() {
                     ZaApp.getInstance().getCurrentController().popupErrorDialog (
                         com_zimbra_cert_manager.dupFileNameError + v
                     );
-                    return ;
+                    return;
                 }
                 filenameArr.push (v);
             }
@@ -110,15 +113,15 @@ ZaDomainCertUpload.uploadCertKeyFile = function() {
             if ( n == "certFile") {
                 if (v == null ||  v.length == 0) {
                     ZaApp.getInstance().getCurrentController().popupErrorDialog(com_zimbra_cert_manager.noCertFileError);
-                    return ;
-                }else{
+                    return;
+                } else{
                     ZaDomainCertUpload.uploadInputs["certFile"] = v ;
                 }
-            }else if (n == "keyFile") {
+            } else if (n == "keyFile") {
                 if (v == null || v.length == 0 ) {
                     ZaApp.getInstance().getCurrentController().popupErrorDialog(com_zimbra_cert_manager.noKeyFileError);
-                    return ;
-                }else{
+                    return;
+                } else {
                     ZaDomainCertUpload.uploadInputs["keyFile"] = v ;
                 }
             }
@@ -126,14 +129,20 @@ ZaDomainCertUpload.uploadCertKeyFile = function() {
     }
 
     var certUploadCallback = new AjxCallback(this, ZaDomainCertUpload._uploadCallback);
-    var um = new AjxPost(ZaDomainCertUpload.getUploadFrameId());
-    window._uploadManager = um;
     try {
-        um.execute(certUploadCallback, document.getElementById (ZaDomainCertUpload.uploadCertFormId));
-        return ;
-    }catch (err) {
-        ZaApp.getInstance().getCurrentController().popupErrorDialog(com_zimbra_cert_manager.certFileNameError) ;
-        return ;
+        if(AjxEnv.supportsHTML5File) {
+            var uploader = new ZaUploader();
+            uploader.upload(ZaDomainCertUpload.attachmentInputId, appContextPath + "/../service/upload?fmt=extended,raw",  certUploadCallback);
+            return;
+        } else {
+            var um = new AjxPost(ZaDomainCertUpload.getUploadFrameId());
+            window._uploadManager = um;
+            um.execute(certUploadCallback, document.getElementById(ZaDomainCertUpload.uploadCertFormId));
+            return;
+        }
+    } catch (ex) {
+        ZaApp.getInstance().getCurrentController().popupErrorDialog((ex && ex.msg) ? ex.msg : com_zimbra_cert_manager.certFileNameError);
+        return;
     }
 }
 
