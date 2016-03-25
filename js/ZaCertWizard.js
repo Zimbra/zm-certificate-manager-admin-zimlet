@@ -455,17 +455,7 @@ ZaCertWizard.prototype.goNext = function() {
             //2. Upload the files
             var certUploadCallback = new AjxCallback(this, this._uploadCallback);
             try {
-                if(AjxEnv.supportsHTML5File) {
-                    var uploader = new ZaUploader();
-                    uploader.upload(ZaCertWizard.AttachmentInputId, appContextPath + "/../service/upload?fmt=extended,raw",  certUploadCallback);
-                } else {
-                    DBG.println("Start uploading the file");
-                    this.setUploadManager(new AjxPost(this.getUploadFrameId()));
-                    var um = this.getUploadManager() ;
-                    window._uploadManager = um;
-                     um.execute(certUploadCallback, document.getElementById (ZaCertWizard.CertUploadFormId));
-                     return ; //allow the callback to handle the wizard buttons
-                }
+                ZaUploader.upload.call(this, certUploadCallback, [ZaCertWizard.certAttachmentInputId, ZaCertWizard.rootCAAttachmentInputId, ZaCertWizard.intermediateCAAttachmentInputId], ZaCertWizard.CertUploadFormId);
             } catch (err) {
                 ZaApp.getInstance().getCurrentController().popupErrorDialog((err && err.msg) ? err.msg : com_zimbra_cert_manager.certFileNameError);
                 return ;
@@ -564,16 +554,16 @@ ZaCertWizard.prototype.setObject = function(entry) {
     this._localXForm.setInstance(this._containedObject);
 }
 
-// ZaCertWizard.CertUploadAttachmentInputId = Dwt.getNextId();
-ZaCertWizard.CertUploadFormId = Dwt.getNextId();
-ZaCertWizard.addIntermediateCADivId = Dwt.getNextId();
-ZaCertWizard.AttachmentInputId = Dwt.getNextId();
-
 ZaCertWizard.getUploadFormHtml = function() {
     // var uri = location.protocol + "//" + document.domain + appContextPath
     // + "/../service/upload";
     // need the full content of the response.
     // 200,'1',[{"filename":"zimbra.crt","aid":"0466544c-1372-4cc3-ad8e-b1ff570dccca:85f82c13-6381-4c84-8915-bfbe515fdbd4","ct":"application/x-x509-ca-cert"},{"filename":"mycert.crt","aid":"0466544c-1372-4cc3-ad8e-b1ff570dccca:2321870e-1229-4359-a9c7-f11222a50042","ct":"application/x-x509-ca-cert"}]
+    ZaCertWizard.addIntermediateCADivId = Dwt.getNextId();
+    ZaCertWizard.CertUploadFormId = Dwt.getNextId();
+    ZaCertWizard.certAttachmentInputId = Dwt.getNextId();
+    ZaCertWizard.rootCAAttachmentInputId = Dwt.getNextId();
+    ZaCertWizard.intermediateCAAttachmentInputId = Dwt.getNextId();
 
     var uri = appContextPath + "/../service/upload?fmt=extended";
     var html = [];
@@ -587,10 +577,12 @@ ZaCertWizard.getUploadFormHtml = function() {
     html[idx++] = "<colgroup><col width=100/><col width='*' /><col width=50 /></colgroup>";
     html[idx++] = "<tbody><tr><td>" + com_zimbra_cert_manager.CERT_upload_comm_cert + "</td>";
     html[idx++] = "<td><input type=file id='";
-    html[idx++] = ZaCertWizard.AttachmentInputId;
+    html[idx++] = ZaCertWizard.certAttachmentInputId;
     html[idx++] = "' name='certFile' size='40' /></td><td></td></tr>";
     html[idx++] = "<tr><td>" + com_zimbra_cert_manager.CERT_upload_root_CA + "</td>";
-    html[idx++] = "<td><input type=file  name='rootCA' size='40' /></td><td></td></tr>";
+    html[idx++] = "<td><input type=file id='";
+    html[idx++] = ZaCertWizard.rootCAAttachmentInputId;
+    html[idx++] = "' name='rootCA' size='40' /></td><td></td></tr>";
     html[idx++] = "</tbody></table></div>";
 
     //add intermediat El
@@ -614,7 +606,9 @@ ZaCertWizard.getIntermediaCAUploadInput = function() {
 
     html[idx++] = "<tbody><tr>";
     html[idx++] = "<td>" + com_zimbra_cert_manager.CERT_upload_intermediate_ca + "</td>";
-    html[idx++] = "<td><input type=file  name='intermediateCA' size='40' /></td>";
+    html[idx++] = "<td><input type=file  id='";
+    ZaCertWizard.intermediateCAAttachmentInputId
+    html[idx++] = "' name='intermediateCA' size='40' /></td>";
     html[idx++] = "<td><span style='padding-left:5px; color: blue; text-decoration: underline; cursor: default;' " + " onmouseout='this.style.cursor=\"default\"' "
             + " onmouseover='this.style.cursor=\"pointer\"'" + " onclick='ZaCertWizard.removeIntermediaCAInput(this);' >" + com_zimbra_cert_manager.Remove_IntermediateCA_Label + "</span></td>";
     html[idx++] = "</tr></tbody></table>";

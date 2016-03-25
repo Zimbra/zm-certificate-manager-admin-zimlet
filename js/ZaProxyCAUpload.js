@@ -202,23 +202,16 @@ ZaProxyCAUpload.uploadCertKeyFile = function() {
     var caller = this.getForm().parent;
     var certUploadCallback = new AjxCallback(this, ZaProxyCAUpload._uploadCallback);
     try {
-        if(AjxEnv.supportsHTML5File) {
-            var uploader = new ZaUploader();
-            uploader.upload(ZaProxyCAUpload.getUploadCertAttachmentId(caller), appContextPath + "/../service/upload?fmt=extended,raw",  certUploadCallback);
-        } else {
-            var um = new AjxPost(ZaProxyCAUpload.getUploadFrameId(caller));
-            window._uploadManager = um;
-            um.execute(certUploadCallback, document.getElementById (certFormId));
-            return;
-        }
+        ZaUploader.upload.call(this, certUploadCallback, ZaProxyCAUpload.getUploadCertAttachmentId(caller), certFormId);
     } catch (err) {
         ZaApp.getInstance().getCurrentController().popupErrorDialog((err && err.msg) ? err.msg : com_zimbra_cert_manager.certFileNameError) ;
         return ;
     }
 }
 
-ZaProxyCAUpload.getUploadFrameId =
-function(caller) {
+ZaProxyCAUpload.prototype.getUploadFrameId =
+function() {
+    var caller = this.getForm().parent;
     var iframeId = ZaProxyCAUpload.getUploadiFrameId(caller);
 	if (!document.getElementById(iframeId)) {
 		//var iframeId = iFrameId;
