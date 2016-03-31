@@ -1141,7 +1141,14 @@ ZaCertWizard.myXFormModifier = function(xFormObject) {
             height : 10
         }, {
             type : _OUTPUT_,
-            value : "<a href='adminres?action=getCSR' onclick='ZaZimbraAdmin.unloadHackCallback();'> " + com_zimbra_cert_manager.CSR_download_msg_2 + "</a> "
+            ref : ZaCert.A_target_server,
+            getDisplayValue : function() {
+                for (var i = 0; i < ZaCert.TARGET_SERVER_CHOICES.length; i++) {
+                    if (ZaCert.TARGET_SERVER_CHOICES[i].value == this.getInstanceValue()) {
+                        return "<a href='/service/extension/com_zimbra_cert_manager/downloadcsr?server=" + ZaCert.TARGET_SERVER_CHOICES[i].value + "' onclick='ZaZimbraAdmin.unloadHackCallback();'> " + com_zimbra_cert_manager.CSR_download_msg_2 + "</a>";
+                    }
+                }
+            }
         }, {
             type : _SPACER_,
             height : 10
