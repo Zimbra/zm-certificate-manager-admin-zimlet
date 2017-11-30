@@ -10,10 +10,8 @@
     <mkdir dir="${build.zimlet.dir}" />
   </target>
 
-  <target name="clean" description="Removes build files and undeploys extension">
-    <!--<antcall target="stop-jetty"/>-->
+  <target name="clean" description="Removes build files">
     <delete dir="${build.dir}" />
-    <!--<antcall target="start-jetty"/>-->
   </target>
 
   <target name="package-zimlet" depends='build-init' description="put zimlet files into zip archive for deployment">
@@ -23,25 +21,24 @@
     </zip>
   </target>
 
-  <target name="deploy-zimlet" depends='package-zimlet,resolve' description="install UI files, deploy zimlet to LDAP">
+  <target name="deploy-zimlet" depends='package-zimlet' description="install UI files, deploy zimlet to LDAP">
     <echo>Deploying zimlet: com_zimbra_cert_manager</echo>
-    <mkdir dir="${build.zimlet.dir}" />
-    <java classname="com.zimbra.cs.zimlet.ZimletUtil" fork="true" classpathref="class.path" failonerror="true">
-      <arg line="-q" />
-      <arg line="deploy" />
-      <arg file="${build.zimlet.dir}/${zimlet.file}" />
-    </java>
+    <exec executable="zmzimletctl" failonerror="true">
+        <arg line="-q" />
+        <arg line="deploy" />
+        <arg file="${build.zimlet.dir}/${zimlet.file}" />
+    </exec>
+
+    <antcall target='restart-webserver'/>
+  </target>
+
+  <target name='restart-webserver'>
+    <exec executable="zmmailboxdctl">
+      <arg value="restart"/>
+    </exec>
   </target>
 
   <!-- empty jar target used in publish-local of ant-global.xml -->
   <target name="jar"></target>
-
-  <!-- We need to figure out how to automate jetty start/stop in a common way across repos -->
-  <!--<target name="start-jetty">-->
-    <!--<ant dir="../ZimbraServer" target="start-jetty" inheritAll="false"/>-->
-  <!--</target>-->
-  <!--<target name="stop-jetty">-->
-    <!--<ant dir="../ZimbraServer" target="stop-jetty" inheritAll="false"/>-->
-  <!--</target>-->
 
 </project>

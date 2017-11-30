@@ -1,19 +1,22 @@
-## Steps to build
+## zm-certificate-manager-admin-zimlet
 
-1. mkdir ~/.zcs-deps
+## Getting Started
+To setup a development environment make sure all the prerequisites are in place and then go ahead with build & deploy.
 
-2. Ensure that the following jars are present under ~/.zcs-deps dir.
-	- ant-contrib-1.0b1.jar (You can get this from perforce ZimbraCommon/jars)	
-	
-   Ensure that the following jars are present under ~/.zcs-deps or /opt/zimbra/lib/jars dir:
-	- zimbracommon.jar (you can build this from zm-common repo)
-	- zimbrasoap.jar (you can build this from zm-soap repo)
-	- zimbraclient.jar (you can build this from zm-client repo)
-	- zimbrastore.jar (you can build this from zm-store repo)
-	- zimbra-native.jar (you can build this from zm-native repo)
+### Steps to build & deploy.
+To create zimlet package:
+ ```
+ant package-zimlet
+ ```
 
-3. git clone ssh://git@stash.corp.synacor.com:7999/zimbra/zm-zcs.git ../zm-zcs
+To deploy this zimlet:
+ ```
+ant deploy-zimlet
+ ```
 
-4. git clone https://github.com/Zimbra/zimbra-package-stub.git ../zimbra-package-stub
-
-5. ant package-zimlet / ant deploy-zimlet
+### Prerequisites
+- Create .zcs-deps folder in home directory
+- Copy ant-contrib-1.0b1.jar to .zcs-deps
+- Clone [zimbra-package-stub](https://github.com/Zimbra/zimbra-package-stub) at same level.
+- Clone [zm-zcs](https://github.com/Zimbra/zm-zcs) at same level.
+- ant is available on command line.
