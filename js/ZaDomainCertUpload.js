@@ -42,9 +42,15 @@ ZaDomainCertUpload.myXFormModifier = function(xFormObject) {
     ]};
     var bottomSpace = {type:_SPACER_, height:"10"};
     var tempItems;
-    if(xFormObject.items[2].items.length >=9 && xFormObject.items[2].items[9]) {
-        tempItems = xFormObject.items[2].items[9].items;
-        tempItems.splice(3,0,uploadCertUI, bottomSpace);
+    if (ZaServerVersionInfo.version.split(".")[0] == "8") {
+        var tabChoices = this.getTabChoices();
+        for (var i = 0; i < tabChoices.length; i++) {
+            if (tabChoices[i].label == ZaMsg.TABT_Certificate && xFormObject.items[2].items[i].id == "domain_form_cert_tab") {
+                tempItems = xFormObject.items[2].items[i].items;
+                tempItems.splice(3,0,uploadCertUI, bottomSpace);
+                break;
+            }
+        }
     } else {  // support 7.0.0, place the UI items as the last one
         var tablen = xFormObject.items[2].items.length;
         tempItems = xFormObject.items[2].items[tablen>0?(tablen-1):0].items;
